@@ -13,7 +13,7 @@ import NumbersRoundedIcon from '@mui/icons-material/NumbersRounded';
 import SquareTwoToneIcon from '@mui/icons-material/SquareTwoTone';
 import WrapTextIcon from '@mui/icons-material/WrapText';
 
-import { copyToClipboard } from '~/common/util/clipboardUtils';
+import { copyToClipboard, copyMermaidImageToClipboard } from '~/common/util/clipboardUtils';
 import { useFullscreenElement } from '~/common/components/useFullscreenElement';
 import { useUIPreferencesStore } from '~/common/state/store-ui';
 
@@ -142,12 +142,6 @@ function RenderCodeImpl(props: RenderCodeBaseProps & {
 
   // const handleMouseOverLeave = React.useCallback(() => setIsHovering(false), []);
 
-  const handleCopyToClipboard = React.useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    copyToClipboard(code, 'Code');
-  }, [code]);
-
-
   // heuristics for specialized rendering
 
   const lcBlockTitle = blockTitle.trim().toLowerCase();
@@ -171,6 +165,18 @@ function RenderCodeImpl(props: RenderCodeBaseProps & {
   const cannotRenderLineNumbers = !renderSyntaxHighlight || showSoftWrap;
   const renderLineNumbers = !cannotRenderLineNumbers && ((showLineNumbers && uiComplexityMode !== 'minimal') || isFullscreen);
 
+
+  const handleCopyToClipboard = React.useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isMermaidCode) {
+      copyMermaidImageToClipboard(code, isMermaidCode);
+    }else if(isPlantUMLCode) {
+      alert("Plant UML is not available for copying to clipboard");
+    }
+     else {
+      copyToClipboard(code, 'Code');
+    }
+  }, [code, isMermaidCode]);
 
   // Language & Highlight
   const { highlightedCode, inferredCodeLanguage } = React.useMemo(() => {
